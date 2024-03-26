@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image, StyleSheet, View, TouchableOpacity, Text, TextInput } from "react-native";
 
-export default function Login(){
+export default function Login({setLogado}){//Recebendo o setLogado por parâmetro
     //Variável de estado que altera entre o Login e o Cadastro
     const [isRegistering, setIsRegistering] = useState(false);
 
@@ -16,6 +17,18 @@ export default function Login(){
         setCadastroMedico(!cadastroMedico)
     }
 
+    const [CPF, setCPF] = useState('')
+    const [ senha, setSenha ] = useState('')
+
+    async function realizaLogin(){
+        if( CPF == '123' && senha =='123'){
+            await AsyncStorage.setItem("usuario", CPF);
+            setLogado(true)
+        }
+        else{
+            setLogado(false)
+        }
+    }
     return(
         <View style={style.container}>
             <Image
@@ -49,11 +62,17 @@ export default function Login(){
                             placeholder="Insira seu CPF..."
                             keyboardType='numeric'
                             style={style.input}
+                            value={CPF}
+                            textInput={CPF} 
+                            onChangeText={(digitado) => setCPF(digitado)}
                         />
                         <TextInput
                             placeholder="Insira sua senha..."
                             keyboardType='numeric'
                             style={style.input}
+                            value={senha}
+                            textInput={senha} 
+                            onChangeText={(digitado) => setSenha(digitado)}
                         />
                     </>
                 ) : (
@@ -127,7 +146,7 @@ export default function Login(){
                     <Text style={style.registerLink}>{isRegistering ? 'Já tenho uma conta!' : 'Não tenho uma conta!'}</Text>
                 </TouchableOpacity>
                 {!isRegistering && (
-                    <TouchableOpacity style={style.btn}>
+                    <TouchableOpacity style={style.btn} onPress={realizaLogin}>
                         <Text style={style.btnText}>ENTRAR</Text>
                     </TouchableOpacity>
                 )}
