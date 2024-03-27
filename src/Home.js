@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { View, Button, Text, StyleSheet, Image, FlatList, TouchableOpacity } from "react-native";
 import { Ionicons, FontAwesome5, FontAwesome, Entypo } from "@expo/vector-icons";
+import NetInfo from '@react-native-community/netinfo';
 
 //Importando o contexto
 import { UserContext } from './Context/UserContext';
@@ -9,13 +10,16 @@ export default function Home() {
 
   //Pegando o nome do usuário
   const { usuario } = useContext(UserContext)
+  const { usuarioNome } = useContext(UserContext)
 
+  //Array de dados do primeiro carrossel
   const dados = [
     { id: '1', titulo: 'CUIDANDO DE VOCÊ E DE SUA FAMÍLIA', icon: <FontAwesome5 name="hospital" size={50} color="black" /> },
     { id: '2', titulo: 'CONTE COM O MELHOR ATENDIMENTO PROFISSIONAL', icon: <FontAwesome name="stethoscope" size={50} color="black" /> },
     { id: '3', titulo: 'CUIDE DE SUA SAÚDE, INVISTA EM NOSSOS PLANOS', icon: <Entypo name="v-card" size={50} color="black" /> },
   ];
 
+  //Box do primeiro carrossel
   const Box = ({ titulo, icon }) => (
     <View style={style.boxContaineritem}>
       <Text style={style.textContaineritem}>{titulo}</Text>
@@ -23,9 +27,11 @@ export default function Home() {
     </View>
   );
 
+  //Carrossel automático do primeiro carrossel
   const [currentIndexCarrossel1, setCurrentIndexCarrossel1] = useState(0);
   const flatListRefCarrossel1 = useRef(null);
-
+    
+  //Carrossel automático do primeiro carrossel
   useEffect(() => {
     const interval = setInterval(() => {
       if (currentIndexCarrossel1 < dados.length - 1) {
@@ -39,6 +45,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [currentIndexCarrossel1]);
 
+  //Array de dados do segundo carrossel
   const dadosMedicos = [
     { id: '1', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
     { id: '2', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
@@ -49,6 +56,7 @@ export default function Home() {
     { id: '8', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
   ];
 
+  //Box do segundo carrossel
   const BoxMedicos = ({ name, image }) => (
     <View style={style.boxContaineritemMedico}>
       <Image source={image} />
@@ -56,9 +64,11 @@ export default function Home() {
     </View>
   );
 
+  //Carrossel automático do segundo carrossel  
   const [currentIndexCarrossel2, setCurrentIndexCarrossel2] = useState(0);
   const flatListRefCarrossel2 = useRef(null);
 
+  //Carrossel automático do segundo carrrossel
   useEffect(() => {
     const interval = setInterval(() => {
       if (currentIndexCarrossel2 < dadosMedicos.length - 1) {
@@ -72,6 +82,18 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [currentIndexCarrossel2]);
 
+  const [isConnected, setIsConnected] = useState(true); //Por padrão já vai vir conectado
+
+    useEffect(() => {
+      const unsubscribe = NetInfo.addEventListener(state => {
+        setIsConnected(state.isConnected);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }, []);
+
   return (
     <View style={style.container}>
       <View style={style.header}>
@@ -81,7 +103,11 @@ export default function Home() {
           />
           <View style={style.containerText}>
             <Text style={style.textHeader}>Olá,</Text>
-            <Text style={[style.textHeader, { color: "#00975C" }]}>{usuario} !</Text>
+            <Text>
+              <Text style={[style.textHeader, { color: "#00975C" }]}>
+                {usuario && usuario.nome ? usuario.nome : "Carregando..."}
+              </Text>
+            </Text>    
           </View>
         </View>
         <View>
@@ -112,22 +138,36 @@ export default function Home() {
         <View>
           <Text style={style.textMedicos}>CONTE COM OS MELHORES PROFISSIONAIS</Text>
         </View>
-        <View style={style.carrosselMedicos}>
-          <FlatList
-            ref={flatListRefCarrossel2}
-            data={dadosMedicos}
-            renderItem={({ item }) => (
-              <BoxMedicos
-                name={item.name}
-                image={item.image}
+        {isConnected ? 
+          (
+            <>
+              <View style={style.carrosselMedicos}>
+              <FlatList
+                ref={flatListRefCarrossel2}
+                data={dadosMedicos}
+                renderItem={({ item }) => (
+                  <BoxMedicos
+                    name={item.name}
+                    image={item.image}
+                  />
+                )}
+                keyExtractor={item => item.id}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={style.flatListContainerMedico}
               />
-            )}
-            keyExtractor={item => item.id}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={style.flatListContainerMedico}
-          />
-        </View>
+            </View>
+            </>
+          )
+          : 
+            (
+              <>
+                  <View style={style.noInternet}>
+                    <Text style={style.textNoInternet}>Você não tem consultas!</Text>
+                  </View>               
+                </>
+            )
+        }
       </View>
     </View>
   );
@@ -243,4 +283,14 @@ const style = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
+  noInternet: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+},
+  textNoInternet: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    color: 'red', // Altere a cor conforme necessário
+}
 });

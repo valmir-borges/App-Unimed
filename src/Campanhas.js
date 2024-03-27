@@ -15,10 +15,15 @@ export default function Campanhas(){
   const flatListRef = useRef(null);
 
   const BoxCampanha = ({ titulo, image }) => (
-    <View style={style.boxContainerCampanha}>
+    <LinearGradient
+    colors={['#FFFFFF', '#1AD990']}
+    start={{x: 0, y: 0.5}}
+    end={{x: 1, y: 0.5}}
+    style={style.boxContainerCampanha}
+    >
       <Image source={image} style={style.imageCampanha} />
       <Text style={style.textContainerCampanha}>{titulo}</Text>
-    </View>
+    </LinearGradient>
   );
 
     return(

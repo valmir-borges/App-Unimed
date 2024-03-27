@@ -1,15 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { StyleSheet } from 'react-native';
 import UserProvider from './src/Context/UserContext';
 
 //Importando a página de Rotas
 import Rotas from './src/Rotas';
 
-const Tab = createBottomTabNavigator();
-
 export default function App() {
 
-    return (
+    return (//O provider está abraçando todas as rotas do meu app, portanto o contexto está disponível para todos
         <UserProvider>
             <Rotas/>
         </UserProvider>

@@ -39,19 +39,6 @@ export default function Rotas(){
                     }}
                     />
                     <Tab.Screen 
-                    name="Dados" 
-                    component={Dados}
-                    options={{
-                        tabBarIcon: (tabInfo) => {
-                            return (<Entypo
-                            name="user"
-                            size={24}
-                            color={tabInfo.focused ? "#006600" : "#8e8e93"}
-                        />)
-                        }
-                    }}
-                    />
-                    <Tab.Screen 
                     name="Consultas" 
                     component={Consultas}
                     options={{
@@ -71,6 +58,19 @@ export default function Rotas(){
                         tabBarIcon: (tabInfo) => {
                             return (<Ionicons
                             name="newspaper"
+                            size={24}
+                            color={tabInfo.focused ? "#006600" : "#8e8e93"}
+                        />)
+                        }
+                    }}
+                    />
+                    <Tab.Screen 
+                    name="Dados" 
+                    component={Dados}
+                    options={{
+                        tabBarIcon: (tabInfo) => {
+                            return (<Entypo
+                            name="user"
                             size={24}
                             color={tabInfo.focused ? "#006600" : "#8e8e93"}
                         />)
