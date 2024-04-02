@@ -1,85 +1,147 @@
-import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, TextInput } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, TextInput, Keyboard, Platform, Alert } from "react-native";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-
+import uuid from 'react-native-uuid';
+import * as Calendar from 'expo-calendar';
 
 export default function Consultas(){
+
+    async function getPermissions(){
+        const { status } = await Calendar.requestCalendarPermissionsAsync();
+        if (status === 'granted') {
+          const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        }
+    }
+
+    useEffect(()=>{
+        getPermissions();
+    }, [])
 
     const [cadastrarConsulta, setCadastrarConsulta] = useState(false);
     const [tipoConsulta, setTipoConsulta] = useState('');
     const [nomeMedico, setNomeMedico] = useState('');
     const [dataConsulta, setDataConsulta] = useState('');
-    const [horaConsulta, setHoraConsulta] = useState('');
     const [observacao, setObservacao] = useState('');
     const [data, setData] = useState([]);
-
+    const [dados, setDados] = useState([]);
     const flatListRef = useRef(null);
 
     const renderItem = ({ item, index }) => (
-        <LinearGradient
-        colors={['#F5F5F5', '#1AD990']}
-        start={{x: 0, y: 0.5}}
-        end={{x: 1, y: 0.5}}
-        style={style.boxConsulta}
-      >
-        <TouchableOpacity onPress={() => excluirConsulta(index)} style={style.deleteIcon}>
-            <FontAwesome5 name="trash" size={30} color="black" />        
-        </TouchableOpacity>
-        <Image source={require('../assets/img/Medico.png')} style={style.medicoImage}/>
-        <View style={style.bottomTextContainer}>
-          <View style={style.column}>
-            <Text style={style.leftText}>Tipo de consulta:</Text>
-            <Text style={style.leftText}>Médico:</Text>
-            <Text style={style.leftText}>Data:</Text>
-            <Text style={style.leftText}>Hora:</Text>
-            <Text style={style.leftText}>Observação:</Text>
-          </View>
-          <View style={style.column}>
-            <Text style={style.rightText}>{item.tipo}</Text>
-            <Text style={style.rightText}>{item.nomeMedico}</Text>
-            <Text style={style.rightText}>{item.data}</Text>
-            <Text style={style.rightText}>{item.hora}</Text>
-            <Text style={style.rightText}>{item.observacao}</Text>
-          </View>
+        <View style={style.boxConsulta}> 
+            <TouchableOpacity onPress={() => excluirConsulta(index)} style={style.deleteIcon}>
+                <FontAwesome5 name="trash" size={30} color="black" />        
+            </TouchableOpacity>
+            <Image source={require('../assets/img/Medico.png')} style={style.medicoImage}/>
+            <View style={style.bottomTextContainer}>
+            <View style={style.column}>
+                <Text style={style.leftText}>Tipo de consulta:</Text>
+                <Text style={style.leftText}>Médico:</Text>
+                <Text style={style.leftText}>Data:</Text>
+                <Text style={style.leftText}>Observação:</Text>
+            </View>
+            <View style={style.column}>
+                <Text style={style.rightText}>{item.tipo}</Text>
+                <Text style={style.rightText}>{item.nomeMedico}</Text>
+                <Text style={style.rightText}>{item.data}</Text>
+                <Text style={style.rightText}>{item.observacao}</Text>
+            </View>
+            </View>
         </View>
-      </LinearGradient>
     );
     
     function excluirConsulta(index) {
-        const newData = [...data];
-        newData.splice(index, 1); // Remove o item do array na posição index
-        setData(newData); // Atualiza o estado do array de consultas
+        Alert.alert(
+            "Confirmação",
+            "Tem certeza que deseja excluir esta consulta?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Confirmar",
+                    onPress: () => {
+                        const newData = [...data];
+                        newData.splice(index, 1);
+                        setData(newData);
+                    }
+                }
+            ]
+        );
     }
 
     function alternarCadastroConsulta(){
         setCadastrarConsulta(!cadastrarConsulta);
     }
 
-    function cadastrarConsultaFuncao(){
-        const novaConsulta = {//Criando o objeto novaConsulta, para que ele seja inserido no array de data
+    async function cadastrarConsultaFuncao(){
+        const novaConsulta = {
             tipo: tipoConsulta,
             nomeMedico: nomeMedico,
             data: dataConsulta,
-            hora: horaConsulta,
             observacao: observacao
         };
-        setData([...data, novaConsulta]);//Setando no array data a nova consulta
-        alternarCadastroConsulta(); // fechar o formulário de cadastro após o cadastro
+        setData([...data, novaConsulta]);
+        alternarCadastroConsulta();
+        Keyboard.dismiss()
+        if(tipoConsulta != "" && data !== "")
+        {
+            const evento = {
+                id: uuid.v4(),
+                nome: tipoConsulta,
+                inicio: dataConsulta,
+            };
+            const novoEvento = [...dados, evento]
+            setDados(novoEvento);
+            
+            const defaultCalendarSource =
+            Platform.OS === 'ios'
+              ? await Calendar.getDefaultCalendarAsync()
+              : { isLocalAccount: true, name: 'Expo Calendar' };
+
+              const newCalendarID = await Calendar.createCalendarAsync({
+                title: 'Expo Calendar',
+                color: 'blue',
+                entityType: Calendar.EntityTypes.EVENT,
+                sourceId: defaultCalendarSource.id,
+                source: defaultCalendarSource,
+                name: 'internalCalendarName',
+                ownerAccount: 'personal',
+                accessLevel: Calendar.CalendarAccessLevel.OWNER,
+              });
+
+              let inicioDataHora = dataConsulta.split(" ");
+              let inicioData = inicioDataHora[0].split("-");
+              let inicioHora = inicioDataHora[1].split(".");
+              const newEvent = {
+                title: tipoConsulta,
+                startDate: new Date(inicioData[2], inicioData[1] -1, inicioData[0], inicioHora[0], inicioHora[1]),
+                endDate: new Date(inicioData[2], inicioData[1] - 1, inicioData[0], inicioHora[0] + 1, inicioHora[1]),
+                location: 'Consultório Unimed',
+                notes: `Consulta com o: ${nomeMedico}`
+            }
+            try {
+                await Calendar.createEventAsync(newCalendarID, newEvent)
+                alert('Evento criado com sucesso')
+            } catch (error) {
+                console.log( error );
+                alert('Erro ao criar o evento')
+            }
+
+        }
     }
 
     return(
         <View style={style.container}>
             {cadastrarConsulta ? 
             (
-                //Condição verdadeira, ou seja, clicou em cadastrar
                 <>
                     <TouchableOpacity onPress={alternarCadastroConsulta} style={style.backConsultas}>
                         <AntDesign name="back" size={40} color="black" />
                     </TouchableOpacity>
                     <Image
-                        source={require('../assets/img/Logo.png')}
+                        source={require('../assets/img/Logo-2.png')}
                         style={style.logo}
                     />
                     <View style={style.headerConsultas}>
@@ -107,13 +169,6 @@ export default function Consultas(){
                                 onChangeText={setDataConsulta}
                             /> 
                             <TextInput
-                                placeholder="Hora da consulta..."
-                                keyboardType= 'phone-pad'
-                                style={[style.input, style.inputCadastro]}
-                                value={horaConsulta}
-                                onChangeText={setHoraConsulta}
-                            /> 
-                            <TextInput
                                 placeholder="Observação..."
                                 keyboardType= 'phone-pad'
                                 style={[style.input, style.inputCadastro]}
@@ -128,17 +183,16 @@ export default function Consultas(){
             )
             :
             (
-                //Condição falsa, ou seja, não clicou em cadastrar
                 <>
                     <Image
-                        source={require('../assets/img/Logo.png')}
+                        source={require('../assets/img/Logo-2.png')}
                         style={style.logo}
                     />
                     <View style={style.headerConsultas}>
                         <FontAwesome5 name="calendar-day" size={60} color="#00975C" />              
                         <Text style={style.headerText}>SUAS CONSULTAS</Text>
                     </View>
-                    {data == '' ?//Se o array de dados estiver vazio, vai aparecer uma mensagem
+                    {data == '' ?
                         (
                             <>
                                 <View style={style.noConsultasContainer}>
@@ -208,17 +262,17 @@ const style = StyleSheet.create({
         width: 310,
         height: 235,
         borderRadius: 10,
-        justifyContent: 'space-around', // Adicionado para alinhar os elementos verticalmente
+        justifyContent: 'space-around', 
         marginBottom: 10
     },
     medicoImage: {
-        alignSelf: 'center' // Para centralizar a imagem na horizontal
+        alignSelf: 'center' 
     },
     bottomTextContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 10 // Adicionado para espaçamento horizontal entre os textos e as bordas
+        paddingHorizontal: 10 
     },
     column: {
         flexDirection: 'column',
@@ -231,18 +285,18 @@ const style = StyleSheet.create({
         fontSize: 17,
         fontWeight: 'bold',
         marginBottom: 5,
-        textAlign: 'left', // Alinhamento do texto à esquerda
+        textAlign: 'left', 
     },
     rightText: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 17,
         marginBottom: 5,
-        textAlign: 'right', // Alinhamento do texto à direita
+        textAlign: 'right', 
     },
     flatList: {
         width: '100%',
-        paddingHorizontal: 10 // Adicionado para espaçamento horizontal entre a FlatList e as bordas
+        paddingHorizontal: 10 
     },
     flatListConsultas: {
         marginLeft: 'auto',
@@ -251,7 +305,7 @@ const style = StyleSheet.create({
     containerNewConsulta: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between', // Adicionado para alinhar o texto e o botão
+        justifyContent: 'space-between', 
         width: '100%',
         paddingHorizontal: 20,
         marginTop: 10,
@@ -269,7 +323,7 @@ const style = StyleSheet.create({
         backgroundColor: "#00975C",
         marginLeft: 10,
         paddingHorizontal: 20,
-        justifyContent: 'center' // Para centralizar o texto verticalmente dentro do botão
+        justifyContent: 'center' 
     },
     btnText:{
         color: "white",
@@ -289,7 +343,7 @@ const style = StyleSheet.create({
         marginBottom: 15,
     },
     inputCadastro: {
-        textAlign: 'left', // Alinhamento do texto do placeholder à esquerda
+        textAlign: 'left', 
     },
     backConsultas: {
         marginRight: 'auto',
@@ -308,6 +362,6 @@ const style = StyleSheet.create({
     textNoConsultas: {
         fontWeight: 'bold',
         fontSize: 20,
-        color: 'red', // Altere a cor conforme necessário
+        color: 'red', 
     }
 });

@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, Image, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef } from "react";
-import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Campanhas(){
 
@@ -15,39 +14,36 @@ export default function Campanhas(){
   const flatListRef = useRef(null);
 
   const BoxCampanha = ({ titulo, image }) => (
-    <LinearGradient
-    colors={['#FFFFFF', '#1AD990']}
-    start={{x: 0, y: 0.5}}
-    end={{x: 1, y: 0.5}}
-    style={style.boxContainerCampanha}
-    >
-      <Image source={image} style={style.imageCampanha} />
-      <Text style={style.textContainerCampanha}>{titulo}</Text>
-    </LinearGradient>
+      <View style={style.boxContainerCampanha}>
+        <Image source={image} style={style.imageCampanha} />
+        <Text style={style.textContainerCampanha}>{titulo}</Text>
+      </View>
   );
 
     return(
       <View style={style.container}>
         <Image
-          source={require('../assets/img/Logo.png')}
+          source={require('../assets/img/Logo-2.png')}
           style={style.logo}
         />
         <View style={style.headerConsultas}>
           <Ionicons name="newspaper" size={60} color="#00975C" />          
           <Text style={style.headerText}>CAMPANHAS</Text>
         </View>
-        <FlatList
-          ref={flatListRef}
-          data={data}
-          renderItem={({ item }) =>
-            <BoxCampanha
-              titulo={item.titulo}
-              image={item.image}
-            />
-          }
-          keyExtractor={item => item.id}
-          contentContainerStyle={style.flatListContainer}
-        />
+        <View>
+          <FlatList
+            ref={flatListRef}
+            data={data}
+            renderItem={({ item }) =>
+              <BoxCampanha
+                titulo={item.titulo}
+                image={item.image}
+              />
+            }
+            keyExtractor={item => item.id}
+            contentContainerStyle={style.flatListContainer}
+          />
+        </View>
       </View>
     )
 }
@@ -88,7 +84,7 @@ const style = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 10, // Adicionando espaçamento horizontal
-    backgroundColor: '#f2f2f2', // Cor de fundo para melhor visualização
+    backgroundColor: '#00975C', // Cor de fundo para melhor visualização
     borderRadius: 10, // Borda arredondada para boxContainerCampanha
     marginBottom: 10 // Espaçamento inferior entre os itens
   },
@@ -100,5 +96,5 @@ const style = StyleSheet.create({
   textContainerCampanha: {
     fontWeight: 'bold',
     fontSize: 20
-  }
+  },
 })

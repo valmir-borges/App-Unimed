@@ -9,6 +9,8 @@ export default function Login(){//Recebendo o setLogado por parâmetro
 
     const [cadastroMedico, setCadastroMedico] = useState(false)
 
+    const { erro } = useContext(UserContext)
+
     //Função que altera a variável
     const handleToggleRegister = () => {
         setIsRegistering(!isRegistering);
@@ -74,9 +76,12 @@ export default function Login(){//Recebendo o setLogado por parâmetro
     return(
         <View style={style.container}>
             <Image
-                source={require('../assets/img/Logo.png')}
+                source={require('../assets/img/Logo-2.png')}
                 style={style.logo}
             />
+            <View>
+                <Text style={style.textErro}>{erro}</Text>
+            </View>
             <View style={style.containerLogin}>
                 <Image
                     source={require('../assets/img/User-Login.png')}
@@ -320,5 +325,10 @@ const style = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    textErro: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        color: 'red', // Altere a cor conforme necessário
     }
 })

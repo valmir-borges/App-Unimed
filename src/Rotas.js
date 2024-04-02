@@ -33,7 +33,7 @@ export default function Rotas(){
                             return (<Ionicons
                             name="home"
                             size={24}
-                            color={tabInfo.focused ? "#006600" : "#8e8e93"}
+                            color={tabInfo.focused ? "#1AD990" : "#8e8e93"}
                         />)
                         }
                     }}
@@ -46,7 +46,7 @@ export default function Rotas(){
                             return (<Ionicons
                             name="calendar"
                             size={24}
-                            color={tabInfo.focused ? "#006600" : "#8e8e93"}
+                            color={tabInfo.focused ? "#1AD990" : "#8e8e93"}
                         />)
                         }
                     }}
@@ -59,7 +59,7 @@ export default function Rotas(){
                             return (<Ionicons
                             name="newspaper"
                             size={24}
-                            color={tabInfo.focused ? "#006600" : "#8e8e93"}
+                            color={tabInfo.focused ? "#1AD990" : "#8e8e93"}
                         />)
                         }
                     }}
@@ -72,7 +72,7 @@ export default function Rotas(){
                             return (<Entypo
                             name="user"
                             size={24}
-                            color={tabInfo.focused ? "#006600" : "#8e8e93"}
+                            color={tabInfo.focused ? "#1AD990" : "#8e8e93"}
                         />)
                         }
                     }}

@@ -8,7 +8,7 @@ import { UserContext } from './Context/UserContext';
 
 export default function Home() {
 
-  //Pegando o nome do usuário
+  //Pegando o objeto do usuário
   const { usuario } = useContext(UserContext)
   const { usuarioNome } = useContext(UserContext)
 
@@ -98,9 +98,23 @@ export default function Home() {
     <View style={style.container}>
       <View style={style.header}>
         <View style={style.headerLeft}>
-          <Image
-            source={require('../assets/img/User.png')}
-          />
+          {usuario && usuario.tipoUsuario == "Paciente" ? 
+          (
+            <>
+              <Image
+                source={require('../assets/img/Paciente.png')}
+              />
+            </>
+          )
+            :
+            (
+              <>
+                <Image
+                  source={require('../assets/img/Medico.png')}
+                />
+              </>
+            )
+          }
           <View style={style.containerText}>
             <Text style={style.textHeader}>Olá,</Text>
             <Text>
@@ -182,7 +196,8 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: "100%",
-    marginTop: 10
+    marginTop: 10,
+    alignItems: 'center'
   },
   headerLeft: {
     display: 'flex',
@@ -199,7 +214,7 @@ const style = StyleSheet.create({
     fontWeight: 'bold'
   },
   logo: {
-    width: 180,
+    width: 200,
     height: 60
   },
   container: {
