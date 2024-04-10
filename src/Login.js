@@ -329,6 +329,6 @@ const style = StyleSheet.create({
     textErro: {
         fontWeight: 'bold',
         fontSize: 18,
-        color: 'red', // Altere a cor conforme necessário
+        color: 'red',
     }
 })

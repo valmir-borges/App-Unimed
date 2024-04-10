@@ -27,10 +27,12 @@ export default function Consultas(){
     const [dados, setDados] = useState([]);
     const flatListRef = useRef(null);
 
+    const [ error, setError] = useState('')
+
     const renderItem = ({ item, index }) => (
         <View style={style.boxConsulta}> 
             <TouchableOpacity onPress={() => excluirConsulta(index)} style={style.deleteIcon}>
-                <FontAwesome5 name="trash" size={30} color="black" />        
+                <FontAwesome5 name="trash" size={30} color="white" />        
             </TouchableOpacity>
             <Image source={require('../assets/img/Medico.png')} style={style.medicoImage}/>
             <View style={style.bottomTextContainer}>
@@ -75,62 +77,78 @@ export default function Consultas(){
         setCadastrarConsulta(!cadastrarConsulta);
     }
 
-    async function cadastrarConsultaFuncao(){
-        const novaConsulta = {
-            tipo: tipoConsulta,
-            nomeMedico: nomeMedico,
-            data: dataConsulta,
-            observacao: observacao
-        };
-        setData([...data, novaConsulta]);
-        alternarCadastroConsulta();
-        Keyboard.dismiss()
-        if(tipoConsulta != "" && data !== "")
+    async function cadastrarConsultaFuncao() {
+        if(tipoConsulta == '' || nomeMedico == '' || dataConsulta == '' || observacao == '')
         {
-            const evento = {
-                id: uuid.v4(),
-                nome: tipoConsulta,
-                inicio: dataConsulta,
+            setError('Preencha todos os campos para agendar uma consulta')
+        }
+        else{
+            const novaConsulta = {
+                tipo: tipoConsulta,
+                nomeMedico: nomeMedico,
+                data: dataConsulta,
+                observacao: observacao
             };
-            const novoEvento = [...dados, evento]
-            setDados(novoEvento);
-            
-            const defaultCalendarSource =
-            Platform.OS === 'ios'
-              ? await Calendar.getDefaultCalendarAsync()
-              : { isLocalAccount: true, name: 'Expo Calendar' };
-
-              const newCalendarID = await Calendar.createCalendarAsync({
-                title: 'Expo Calendar',
-                color: 'blue',
-                entityType: Calendar.EntityTypes.EVENT,
-                sourceId: defaultCalendarSource.id,
-                source: defaultCalendarSource,
-                name: 'internalCalendarName',
-                ownerAccount: 'personal',
-                accessLevel: Calendar.CalendarAccessLevel.OWNER,
-              });
-
-              let inicioDataHora = dataConsulta.split(" ");
-              let inicioData = inicioDataHora[0].split("-");
-              let inicioHora = inicioDataHora[1].split(".");
-              const newEvent = {
-                title: tipoConsulta,
-                startDate: new Date(inicioData[2], inicioData[1] -1, inicioData[0], inicioHora[0], inicioHora[1]),
-                endDate: new Date(inicioData[2], inicioData[1] - 1, inicioData[0], inicioHora[0] + 1, inicioHora[1]),
-                location: 'Consultório Unimed',
-                notes: `Consulta com o: ${nomeMedico}`
+            setData([...data, novaConsulta]);
+            alternarCadastroConsulta();
+            Keyboard.dismiss();
+        
+            if (tipoConsulta !== "" && dataConsulta !== "") {
+                const evento = {
+                    id: uuid.v4(),
+                    nome: tipoConsulta,
+                    inicio: dataConsulta,
+                };
+                const novoEvento = [...dados, evento];
+                setDados(novoEvento);
+        
+                const defaultCalendarSource =
+                    Platform.OS === 'ios'
+                        ? await Calendar.getDefaultCalendarAsync()
+                        : { isLocalAccount: true, name: 'Expo Calendar' };
+        
+                const newCalendarID = await Calendar.createCalendarAsync({
+                    title: 'Expo Calendar',
+                    color: 'blue',
+                    entityType: Calendar.EntityTypes.EVENT,
+                    sourceId: defaultCalendarSource.id,
+                    source: defaultCalendarSource,
+                    name: 'internalCalendarName',
+                    ownerAccount: 'personal',
+                    accessLevel: Calendar.CalendarAccessLevel.OWNER,
+                });
+        
+                let inicioDataHora = dataConsulta.split(" ");
+                let inicioData = inicioDataHora[0].split("-");
+                let inicioHora = inicioDataHora[1].split(".");
+                
+                // Ajuste para a data final ter uma hora a mais
+                let endDate = new Date(inicioData[2], inicioData[1] - 1, inicioData[0], inicioHora[0], inicioHora[1]);
+                endDate.setHours(endDate.getHours() + 1);
+        
+                const newEvent = {
+                    title: tipoConsulta,
+                    startDate: new Date(inicioData[2], inicioData[1] - 1, inicioData[0], inicioHora[0], inicioHora[1]),
+                    endDate: endDate,
+                    location: 'Consultório Unimed',
+                    notes: `Consulta com o: ${nomeMedico}`
+                };
+                try {
+                    await Calendar.createEventAsync(newCalendarID, newEvent);
+                    alert('Consulta marcada com sucesso');
+                    setTipoConsulta('')
+                    setNomeMedico('')
+                    setDataConsulta('')
+                    setObservacao('')
+    
+                } catch (error) {
+                    console.log(error);
+                    alert('Erro ao marcar consulta');
+                }
             }
-            try {
-                await Calendar.createEventAsync(newCalendarID, newEvent)
-                alert('Evento criado com sucesso')
-            } catch (error) {
-                console.log( error );
-                alert('Erro ao criar o evento')
-            }
-
         }
     }
+    
 
     return(
         <View style={style.container}>
@@ -144,6 +162,9 @@ export default function Consultas(){
                         source={require('../assets/img/Logo-2.png')}
                         style={style.logo}
                     />
+                    <View>
+                        <Text style={style.textErro}>{error}</Text>
+                    </View>
                     <View style={style.headerConsultas}>
                         <FontAwesome5 name="calendar-day" size={60} color="#00975C" />              
                         <Text style={style.headerText}>AGENDAR NOVA CONSULTA</Text>
@@ -162,7 +183,7 @@ export default function Consultas(){
                                 onChangeText={setNomeMedico}
                             />
                             <TextInput
-                                placeholder="Dia da consulta..."
+                                placeholder="Data da consulta... (DD-MM-AAAA HH.MM)"
                                 keyboardType= 'phone-pad'
                                 style={[style.input, style.inputCadastro]}
                                 value={dataConsulta}
@@ -170,7 +191,6 @@ export default function Consultas(){
                             /> 
                             <TextInput
                                 placeholder="Observação..."
-                                keyboardType= 'phone-pad'
                                 style={[style.input, style.inputCadastro]}
                                 value={observacao}
                                 onChangeText={setObservacao}
@@ -363,5 +383,11 @@ const style = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 20,
         color: 'red', 
+    },
+    textErro: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        color: 'red',
+        textAlign: 'center'
     }
 });

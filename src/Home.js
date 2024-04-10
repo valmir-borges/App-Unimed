@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import { View, Button, Text, StyleSheet, Image, FlatList, TouchableOpacity } from "react-native";
+import { View, Button, Text, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons, FontAwesome5, FontAwesome, Entypo } from "@expo/vector-icons";
 import NetInfo from '@react-native-community/netinfo';
 
@@ -10,13 +10,14 @@ export default function Home() {
 
   //Pegando o objeto do usuário
   const { usuario } = useContext(UserContext)
-  const { usuarioNome } = useContext(UserContext)
+  const firstname = usuario && usuario.nome ? usuario.nome.split(' ')[0] : null;
 
   //Array de dados do primeiro carrossel
   const dados = [
-    { id: '1', titulo: 'CUIDANDO DE VOCÊ E DE SUA FAMÍLIA', icon: <FontAwesome5 name="hospital" size={50} color="black" /> },
-    { id: '2', titulo: 'CONTE COM O MELHOR ATENDIMENTO PROFISSIONAL', icon: <FontAwesome name="stethoscope" size={50} color="black" /> },
-    { id: '3', titulo: 'CUIDE DE SUA SAÚDE, INVISTA EM NOSSOS PLANOS', icon: <Entypo name="v-card" size={50} color="black" /> },
+    { id: '1', titulo: 'CUIDANDO DE VOCÊ E DE SUA FAMÍLIA', icon: <FontAwesome5 name="hospital" size={50} color="white" /> },
+    { id: '2', titulo: 'CONTE COM O MELHOR ATENDIMENTO PROFISSIONAL', icon: <FontAwesome name="stethoscope" size={50} color="white" /> },
+    { id: '3', titulo: 'CUIDE DE SUA SAÚDE, INVISTA EM NOSSOS PLANOS', icon: <Entypo name="v-card" size={50} color="white" /> },
+    { id: '4', titulo: 'FIQUE TRANQUILO, NÓS CUIDAMOS DE VOCÊ.', icon: <Entypo name="heart" size={50} color="white" /> },
   ];
 
   //Box do primeiro carrossel
@@ -48,12 +49,12 @@ export default function Home() {
   //Array de dados do segundo carrossel
   const dadosMedicos = [
     { id: '1', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
-    { id: '2', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
-    { id: '4', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
-    { id: '5', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
-    { id: '6', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
-    { id: '7', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
-    { id: '8', name: 'Dr. Nefário', image: require('../assets/img/Medico.png') },
+    { id: '2', name: 'Dr. William', image: require('../assets/img/Medico.png') },
+    { id: '4', name: 'Dr. Mateus', image: require('../assets/img/Medico.png') },
+    { id: '5', name: 'Dr. Francisco', image: require('../assets/img/Medico.png') },
+    { id: '6', name: 'Dra. Poups', image: require('../assets/img/Medico.png') },
+    { id: '7', name: 'Dr. Fernando', image: require('../assets/img/Medico.png') },
+    { id: '8', name: 'Dr. Antônio', image: require('../assets/img/Medico.png') },
   ];
 
   //Box do segundo carrossel
@@ -95,67 +96,65 @@ export default function Home() {
     }, []);
 
   return (
-    <View style={style.container}>
-      <View style={style.header}>
-        <View style={style.headerLeft}>
-          {usuario && usuario.tipoUsuario == "Paciente" ? 
+    <ScrollView style={style.container}>
+    <View style={style.header}>
+      <View style={style.headerLeft}>
+        {usuario && usuario.tipoUsuario == "Paciente" ? 
+        (
+          <>
+            <Image
+              source={require('../assets/img/Paciente.png')}
+            />
+          </>
+        )
+          :
           (
             <>
               <Image
-                source={require('../assets/img/Paciente.png')}
+                source={require('../assets/img/Medico.png')}
               />
             </>
           )
-            :
-            (
-              <>
-                <Image
-                  source={require('../assets/img/Medico.png')}
-                />
-              </>
-            )
-          }
-          <View style={style.containerText}>
-            <Text style={style.textHeader}>Olá,</Text>
-            <Text>
-              <Text style={[style.textHeader, { color: "#00975C" }]}>
-                {usuario && usuario.nome ? usuario.nome : "Carregando..."}
-              </Text>
-            </Text>    
-          </View>
-        </View>
-        <View>
-          <Image
-            source={require('../assets/img/Logo.png')}
-            style={style.logo}
-          />
+        }
+        <View style={style.containerText}>
+          <Text style={style.textHeader}>Olá,</Text>
+          <Text>
+            <Text style={[style.textHeader, { color: "#00975C" }]}>
+              {usuario && usuario.nome ? `${firstname} !`: "Carregando..."}
+            </Text>
+          </Text>    
         </View>
       </View>
-      <View style={style.containerBox}>
-        <FlatList
-          ref={flatListRefCarrossel1}
-          data={dados}
-          renderItem={({ item }) =>
-            <Box
-              titulo={item.titulo}
-              icon={item.icon}
-            />
-          }
-          keyExtractor={item => item.id}
-          contentContainerStyle={style.flatListContainer}
-          horizontal={true}
-          pagingEnabled={true}
-          showsHorizontalScrollIndicator={false} // Oculta a barra de rolagem horizontal
+      <View>
+        <Image
+          source={require('../assets/img/Logo.png')}
+          style={style.logo}
         />
       </View>
-      <View style={style.containerMedicos}>
-        <View>
-          <Text style={style.textMedicos}>CONTE COM OS MELHORES PROFISSIONAIS</Text>
-        </View>
-        {isConnected ? 
-          (
-            <>
-              <View style={style.carrosselMedicos}>
+    </View>
+    <View style={style.containerBox}>
+      <FlatList
+        ref={flatListRefCarrossel1}
+        data={dados}
+        renderItem={({ item }) =>
+          <Box
+            titulo={item.titulo}
+            icon={item.icon}
+          />
+        }
+        keyExtractor={item => item.id}
+        contentContainerStyle={style.flatListContainer}
+        horizontal={true}
+        pagingEnabled={true}
+        showsHorizontalScrollIndicator={false} // Oculta a barra de rolagem horizontal
+      />
+    </View>
+      <View>
+        <Text style={style.textMedicos}>CONTE COM OS MELHORES PROFISSIONAIS</Text>
+      {isConnected ? 
+        (
+          <>
+            <View style={style.carrosselMedicos}>
               <FlatList
                 ref={flatListRefCarrossel2}
                 data={dadosMedicos}
@@ -171,19 +170,32 @@ export default function Home() {
                 contentContainerStyle={style.flatListContainerMedico}
               />
             </View>
-            </>
+          </>
+        )
+        : 
+          (
+            <>
+                <View style={style.noInternet}>
+                  <Text style={style.textNoInternet}>Você não tem consultas!</Text>
+                </View>    
+              </>
           )
-          : 
-            (
-              <>
-                  <View style={style.noInternet}>
-                    <Text style={style.textNoInternet}>Você não tem consultas!</Text>
-                  </View>               
-                </>
-            )
-        }
+      }
+      <View style={style.containerLocation}>
+        <View style={style.textLocation}>
+          <Text style={{color: '#00975C', fontSize: 17, fontWeight: 'bold', marginBottom: 10}}>SEMPRE HÁ UMA UNIDADE PERTINHO DE VOCÊ</Text>
+          <Text style={{fontWeight: 'bold', fontSize: 15, marginBottom: 10}}>Temos mais de 1000 unidades por todo o Brasil</Text>
+        </View>
+      <View style={style.containerFoto}>
+        <Image
+          source={require('../assets/img/Location.png')}
+          style={style.imageLocation}
+        />
       </View>
     </View>
+    </View>
+  </ScrollView>
+  
   );
 }
 const style = StyleSheet.create({
@@ -240,7 +252,7 @@ const style = StyleSheet.create({
   textContaineritem: {
     color: 'white',
     fontWeight: 'bold',
-    flex: 1, // Ocupa todo o espaço possível
+    flex: 1,
     textAlign: 'center',
     fontSize: 18
   },
@@ -248,16 +260,12 @@ const style = StyleSheet.create({
     marginLeft: 10,
     justifyContent: 'center',
   },
-  containerMedicos: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginTop: 30
-  },
   textMedicos: {
     fontSize: 18,
     fontWeight: 'bold',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+    marginTop: 20,
   },
   carrosselMedicos: {
     marginTop: 20,
@@ -267,7 +275,7 @@ const style = StyleSheet.create({
     height: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10, // Espaço entre os médicos
+    marginBottom: 10,
   },
   textContaineritemMedico: {
     color: 'black',
@@ -302,10 +310,26 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-},
-  textNoInternet: {
-    fontWeight: 'bold',
-    fontSize: 20,
-    color: 'red', // Altere a cor conforme necessário
-}
+  },
+    textNoInternet: {
+      fontWeight: 'bold',
+      fontSize: 20,
+      color: 'red',
+  },
+  containerLocation: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  textLocation: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  containerFoto: {
+    alignItems: 'center',
+  },
+  imageLocation: {
+    borderRadius: 20,
+    marginBottom: 20
+  }
 });

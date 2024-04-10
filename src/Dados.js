@@ -32,131 +32,27 @@ export default function Dados(){
                 </>
               )
             }
-            <Text style={style.subHeaderText}>Exibindo dados do usuário {usuario.tipoUsuario}</Text>
+            <Text style={style.subHeaderText}>{usuario.tipoUsuario}: <Text style={style.nomeUser}>{usuario.nome}</Text></Text>
         </View>
-        { usuario.tipoUsuario == "Paciente"
-          ? (//Se o usuário for paciente exibe isso
-            <>
-              <View style={style.formCadastro}>
-                <View style={style.inputPair}>
-                  <TextInput
-                      placeholder="Insira seu nome..."
-                      style={[style.input, style.inputCadastro]}
-                      value={usuario.nome}
-                      textInput={usuario.nome}
-                  />
-                    <TextInput
-                        placeholder="Insira seu telefone..."
-                        keyboardType= 'phone-pad'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.telefone}
-                        textInput={usuario.telefone}
-                    />
-                </View>
-                <View style={style.inputPair}>
-                    <TextInput
-                        placeholder="Insira seu email..."
-                        keyboardType= 'email-address'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.email}
-                        textInput={usuario.email}
-                    />
-                    <TextInput
-                        placeholder="Insira seu CPF..."
-                        keyboardType='numeric'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.cpf}
-                        textInput={usuario.cpf}
-                    />
-                </View>
-                <View style={style.inputPair}>
-                    <TextInput
-                        placeholder="Insira seu idade..."
-                        keyboardType='numeric'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.idade}
-                        textInput={usuario.idade}
-                    />
-                    <TextInput
-                        placeholder="Insira seu sexo..."
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.sexo}
-                        textInput={usuario.sexo}
-                    />
-                </View>
-              </View>
-            </>
-          )
-          :
-          (//Se ele for diferente de paciente irá exibir isto, ou seja, ele é médico
-            <>
-              <View style={style.formCadastro}>
-                <View style={style.inputPair}>
-                  <TextInput
-                      placeholder="Insira seu nome..."
-                      style={[style.input, style.inputCadastro]}
-                      value={usuario.nome}
-                      textInput={usuario.nome}
-                  />
-                    <TextInput
-                        placeholder="Insira seu telefone..."
-                        keyboardType= 'phone-pad'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.telefone}
-                        textInput={usuario.telefone}
-                    />
-                </View>
-                <View style={style.inputPair}>
-                    <TextInput
-                        placeholder="Insira seu email..."
-                        keyboardType= 'email-address'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.email}
-                        textInput={usuario.email}
-                    />
-                    <TextInput
-                        placeholder="Insira seu CPF..."
-                        keyboardType='numeric'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.cpf}
-                        textInput={usuario.cpf}
-                    />
-                </View>
-                <View style={style.inputPair}>
-                    <TextInput
-                        placeholder="Insira seu idade..."
-                        keyboardType='numeric'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.idade}
-                        textInput={usuario.idade}
-                    />
-                    <TextInput
-                        placeholder="Insira seu sexo..."
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.sexo}
-                        textInput={usuario.sexo}
-                    />
-                </View>
-                <View style={style.inputPair}>
-                    <TextInput
-                        placeholder="Insira seu idade..."
-                        keyboardType='numeric'
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.crm}
-                        textInput={usuario.crm}
-                    />
-                    <TextInput
-                        placeholder="Insira seu sexo..."
-                        style={[style.input, style.inputCadastro]}
-                        value={usuario.enderecoConsultorio}
-                        textInput={usuario.enderecoConsultorio}
-                    />
-                </View>
-              </View>
-            </>
-          )
-        }
-        </View>
+        <View style={style.containerDados}>
+        <View style={style.row}>
+        <Text style={style.label}>Telefone:</Text>
+        <Text style={style.dadoUser}>{usuario.telefone}</Text>
+      </View>
+      <View style={style.row}>
+        <Text style={style.label}>Email:</Text>
+        <Text style={style.dadoUser}>{usuario.email}</Text>
+      </View>
+      <View style={style.row}>
+        <Text style={style.label}>CPF:</Text>
+        <Text style={style.dadoUser}>{usuario.cpf}</Text>
+      </View>
+      <View style={style.row}>
+        <Text style={style.label}>Idade:</Text>
+        <Text style={style.dadoUser}>{usuario.idade}</Text>
+      </View>
+      </View>
+      </View>
     )
 }
 
@@ -177,31 +73,36 @@ const style = StyleSheet.create({
     flexDirection: 'column', // Mudança para layout em coluna
     alignItems: 'center', // Centralizar horizontalmente
     marginBottom: 20,
-    marginTop: 20
+    marginTop: 20,
   },
   subHeaderText: {
     marginTop: 10, // Espaço acima do texto
     fontWeight: 'bold', // Destaque do texto
-    fontSize: 18
+    fontSize: 22
   },
   userImage: {
     marginBottom: 10, // Espaço abaixo da imagem
   },
-  input: {
-    width: '100%',
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
-    height: 50
+  nomeUser: {
+    color: '#00975C'
   },
-  formCadastro: {
-    width: '100%',
+  containerDados: {
+    flexDirection: 'column',
+    paddingHorizontal: 10,
   },
-  inputPair: {
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  inputCadastro: {
-    width: '49%', // Ajuste a largura para acomodar o texto completo do placeholder
+  label: {
+    fontWeight: 'bold',
+    marginRight: 10,
+    fontSize: 20
   },
+  dadoUser:{
+    color: '#00975C',
+    fontWeight: 'bold',
+    fontSize: 20
+  }
 })

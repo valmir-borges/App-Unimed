@@ -30,7 +30,6 @@ export default function Campanhas(){
           <Ionicons name="newspaper" size={60} color="#00975C" />          
           <Text style={style.headerText}>CAMPANHAS</Text>
         </View>
-        <View>
           <FlatList
             ref={flatListRef}
             data={data}
@@ -43,7 +42,6 @@ export default function Campanhas(){
             keyExtractor={item => item.id}
             contentContainerStyle={style.flatListContainer}
           />
-        </View>
       </View>
     )
 }
