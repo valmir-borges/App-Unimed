@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useContext } from 'react';
 import { View, Button, Text, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons, FontAwesome5, FontAwesome, Entypo } from "@expo/vector-icons";
 import NetInfo from '@react-native-community/netinfo';
+import { useBatteryLevel } from 'expo-battery';
 
 //Importando o contexto
 import { UserContext } from './Context/UserContext';
@@ -94,7 +95,10 @@ export default function Home() {
         unsubscribe();
       };
     }, []);
-
+  
+  //Parte da bateria
+  const batteryLevel = useBatteryLevel();
+  
   return (
     <ScrollView style={style.container}>
     <View style={style.header}>
@@ -181,18 +185,24 @@ export default function Home() {
               </>
           )
       }
-      <View style={style.containerLocation}>
-        <View style={style.textLocation}>
-          <Text style={{color: '#00975C', fontSize: 17, fontWeight: 'bold', marginBottom: 10}}>SEMPRE HÁ UMA UNIDADE PERTINHO DE VOCÊ</Text>
-          <Text style={{fontWeight: 'bold', fontSize: 15, marginBottom: 10}}>Temos mais de 1000 unidades por todo o Brasil</Text>
+      {batteryLevel >= 0.2 ? (
+        <View style={style.containerLocation}>
+          <View style={style.textLocation}>
+            <Text style={{color: '#00975C', fontSize: 17, fontWeight: 'bold', marginBottom: 10}}>SEMPRE HÁ UMA UNIDADE PERTINHO DE VOCÊ</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 15, marginBottom: 10}}>Temos mais de 1000 unidades por todo o Brasil</Text>
+          </View>
+          <View style={style.containerFoto}>
+            <Image
+              source={require('../assets/img/Location.png')}
+              style={style.imageLocation}
+            />
+          </View>
         </View>
-      <View style={style.containerFoto}>
-        <Image
-          source={require('../assets/img/Location.png')}
-          style={style.imageLocation}
-        />
-      </View>
-    </View>
+      ) : (
+        <View style={style.containerLocation}>
+          <Text style={{ color: 'red', fontSize: 17, fontWeight: 'bold', marginBottom: 10 }}>Atenção: Bateria baixa</Text>
+        </View>
+      )}
     </View>
   </ScrollView>
   
